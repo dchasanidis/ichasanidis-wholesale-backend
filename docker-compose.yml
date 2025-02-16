@@ -1,0 +1,33 @@
+services:
+  db:
+    image: "postgres"
+    container_name: ichasanidisbackend_postgres
+    hostname: db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_DB: ichasanidis-images
+      POSTGRES_PASSWORD: mysecretpassword
+    volumes:
+      - ./.data:/var/lib/postgresql/data
+    networks:
+      - my_network
+  app:
+    build: .
+    container_name: ichasanidisbackend_app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    environment:
+      DB_HOST: db
+      DB_USER: postgres
+      DB_PASSWORD: mysecretpassword
+      DB_NAME: ichasanidis-images
+      DB_PORT: 5432
+    networks:
+      - my_network
+networks:
+  my_network:
+    driver: bridge
