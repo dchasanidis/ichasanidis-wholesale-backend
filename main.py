@@ -26,7 +26,11 @@ def get_db():
         db.close()
 
 
-@app.post("/images")
+ROOT_API = "/api"
+ROOT_IMAGES = f"{ROOT_API}/images"
+
+
+@app.post("%s" % ROOT_IMAGES)
 async def upload_image(file: UploadFile = File(...),
                        db: Session = Depends(get_db)):
     file_path = os.path.join(UPLOAD_DIR, str(uuid.uuid4()))
@@ -40,12 +44,12 @@ async def upload_image(file: UploadFile = File(...),
     with open(file_path, "wb") as buffer:
         buffer.write(file.file.read())
 
-    resource_uri = f"/images/{img_id}"
+    resource_uri = f"%s/{img_id}" % ROOT_IMAGES
     return JSONResponse(content={"id": img_id, "resource_uri": resource_uri},
                         status_code=201)
 
 
-@app.put("/images/{img_id}")
+@app.put("%s/{img_id}" % ROOT_IMAGES)
 async def update_image(img_id: int, metadata: ImageMetadata, db: Session = Depends(get_db)):
     img = await get_img_or_404(img_id, db)
     img.business_code = metadata.business_code
@@ -56,7 +60,7 @@ async def update_image(img_id: int, metadata: ImageMetadata, db: Session = Depen
 
 
 # Retrieve Image
-@app.get("/images/{img_id}")
+@app.get("%s/{img_id}" % ROOT_IMAGES)
 async def get_image(img_id: int, db: Session = Depends(get_db)):
     img = await get_img_or_404(img_id, db)
 
@@ -71,13 +75,13 @@ async def get_image(img_id: int, db: Session = Depends(get_db)):
     return StreamingResponse(file_stream(), media_type="image/jpeg", headers=headers)
 
 
-@app.get("/images")
+@app.get("%s" % ROOT_IMAGES)
 async def get_images(db: Session = Depends(get_db)):
     images = db.query(Image).all()
     return list(map(lambda x: x.to_dict(), images))
 
 
-@app.get("/images/{img_id}/metadata")
+@app.get("%s/{img_id}/metadata" % ROOT_IMAGES)
 async def get_image_metadata(img_id: int, db: Session = Depends(get_db)):
     img = await get_img_or_404(img_id, db)
     return JSONResponse(content=img.to_dict(), status_code=200)
