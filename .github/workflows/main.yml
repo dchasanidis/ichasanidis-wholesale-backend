@@ -30,9 +30,8 @@ jobs:
             git pull
 
             # Stop and remove existing containers
-            docker compose down || true
-
-            # Build and restart the services
-            docker-compose build --no-cache
-            docker-compose up -d
+            docker build -t ioannischasanidisjewelry-backend:latest .
+            docker compose down
+            docker rm -f ioannischasanidisjewelry-backend || true
+            docker compose up -d
           EOF
