@@ -11,8 +11,6 @@ services:
       POSTGRES_PASSWORD: mysecretpassword
     volumes:
       - ./.data:/var/lib/postgresql/data
-    networks:
-      - bridge
   app:
     build: .
     container_name: ichasanidisbackend_app
@@ -26,5 +24,3 @@ services:
       DB_PASSWORD: mysecretpassword
       DB_NAME: ichasanidis-images
       DB_PORT: 5432
-    networks:
-      - bridge
